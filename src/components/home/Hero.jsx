@@ -30,7 +30,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <p className="text-primary text-xs tracking-[0.5em] mb-4 font-mono">EST. BRONX, NEW YORK</p>
+          <p className="text-primary text-xs tracking-[0.5em] mb-4 font-mono">EST. , NEW YORK</p>
           <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-white leading-[0.9] tracking-tight">
             STAINLESS
             <br />
