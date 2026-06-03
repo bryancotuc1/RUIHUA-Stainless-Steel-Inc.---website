@@ -1,0 +1,65 @@
+{
+  "name": "QuoteRequest",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Client full name"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Client phone number"
+    },
+    "email": {
+      "type": "string",
+      "description": "Client email address"
+    },
+    "project_type": {
+      "type": "string",
+      "enum": [
+        "residential",
+        "commercial",
+        "industrial"
+      ],
+      "description": "Type of project"
+    },
+    "service": {
+      "type": "string",
+      "enum": [
+        "gates_doors",
+        "railings_handrails",
+        "canopies_awnings",
+        "window_guards",
+        "fencing",
+        "custom_fabrication"
+      ],
+      "description": "Service needed"
+    },
+    "description": {
+      "type": "string",
+      "description": "Project details"
+    },
+    "address": {
+      "type": "string",
+      "description": "Installation address"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "contacted",
+        "quoted",
+        "in_progress",
+        "completed"
+      ],
+      "default": "new",
+      "description": "Quote status"
+    }
+  },
+  "required": [
+    "name",
+    "phone",
+    "project_type",
+    "service"
+  ]
+}
