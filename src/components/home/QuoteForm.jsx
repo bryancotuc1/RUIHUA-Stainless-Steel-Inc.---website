@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, Loader2 } from "lucide-react";
@@ -35,10 +34,14 @@ export default function QuoteForm() {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
-    await base44.entities.QuoteRequest.create(form);
-    const response = await base44.functions.invoke("sendQuoteNotification", { data: form });
+    const res = await fetch("/api/send-quote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    const result = await res.json();
     setSubmitting(false);
-    if (response.data?.error) {
+    if (!res.ok || result.error) {
       setError("There was a problem sending your request. Please call us directly at 646-708-2207.");
     } else {
       setSubmitted(true);
