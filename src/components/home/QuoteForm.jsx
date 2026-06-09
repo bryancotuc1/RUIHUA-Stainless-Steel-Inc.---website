@@ -34,6 +34,7 @@ export default function QuoteForm() {
     e.preventDefault();
     setSubmitting(true);
     await base44.entities.QuoteRequest.create(form);
+    await base44.functions.invoke("sendQuoteNotification", { data: form });
     setSubmitting(false);
     setSubmitted(true);
   };

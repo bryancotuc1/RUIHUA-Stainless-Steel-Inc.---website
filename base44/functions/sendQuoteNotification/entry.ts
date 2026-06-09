@@ -4,7 +4,6 @@ Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
         const body = await req.json();
-
         const data = body.data;
 
         if (!data) {
@@ -26,26 +25,39 @@ Deno.serve(async (req) => {
             industrial: "Industrial"
         };
 
-        const emailBody = `
-New Quote Request Received
---------------------------
-
-Name: ${data.name || 'N/A'}
-Phone: ${data.phone || 'N/A'}
-Email: ${data.email || 'N/A'}
-Project Type: ${projectTypeMap[data.project_type] || data.project_type || 'N/A'}
-Service: ${serviceMap[data.service] || data.service || 'N/A'}
-Address: ${data.address || 'N/A'}
-
-Project Details:
-${data.description || 'None provided'}
+        const htmlBody = `
+<h2>New Quote Request — Rui Hua Stainless Steel Inc.</h2>
+<hr/>
+<p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+<p><strong>Phone:</strong> ${data.phone || 'N/A'}</p>
+<p><strong>Email:</strong> ${data.email || 'N/A'}</p>
+<p><strong>Project Type:</strong> ${projectTypeMap[data.project_type] || data.project_type || 'N/A'}</p>
+<p><strong>Service:</strong> ${serviceMap[data.service] || data.service || 'N/A'}</p>
+<p><strong>Address:</strong> ${data.address || 'N/A'}</p>
+<p><strong>Project Details:</strong><br/>${data.description || 'None provided'}</p>
         `.trim();
 
-        await base44.asServiceRole.integrations.Core.SendEmail({
-            to: "jzwu29@yahoo.com",
-            subject: `New Quote Request from ${data.name || 'Unknown'}`,
-            body: emailBody
+        const resendApiKey = Deno.env.get("RESEND_API_KEY");
+
+        const response = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${resendApiKey}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                from: "Rui Hua Stainless Steel Inc. <onboarding@resend.dev>",
+                to: ["jzwu29@yahoo.com"],
+                subject: `New Quote Request from ${data.name || 'Unknown'}`,
+                html: htmlBody
+            })
         });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            return Response.json({ error: result }, { status: 500 });
+        }
 
         return Response.json({ success: true });
     } catch (error) {
