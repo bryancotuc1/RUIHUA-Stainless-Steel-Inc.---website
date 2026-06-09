@@ -25,6 +25,7 @@ export default function QuoteForm() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -33,10 +34,15 @@ export default function QuoteForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+    setError(null);
     await base44.entities.QuoteRequest.create(form);
-    await base44.functions.invoke("sendQuoteNotification", { data: form });
+    const response = await base44.functions.invoke("sendQuoteNotification", { data: form });
     setSubmitting(false);
-    setSubmitted(true);
+    if (response.data?.error) {
+      setError("There was a problem sending your request. Please call us directly at 646-708-2207.");
+    } else {
+      setSubmitted(true);
+    }
   };
 
   if (submitted) {
@@ -163,11 +169,14 @@ export default function QuoteForm() {
       <button
         type="submit"
         disabled={submitting || !form.name || !form.phone || !form.project_type || !form.service}
-        className="w-full bg-primary text-primary-foreground py-4 text-xs tracking-[0.3em] font-mono hover:bg-primary/90 transition-colors border-2 border-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-primary text-primary-foreground py-4 text-xs tracking-[0.3em] font-mono hover:bg-primary/90 transition-colors border-2 border-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
       >
         {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
         {submitting ? "SUBMITTING..." : "REQUEST FABRICATION QUOTE"}
       </button>
+      {error && (
+        <p className="text-destructive text-xs font-mono mt-3 border border-destructive p-3">{error}</p>
+      )}
     </form>
   );
 }

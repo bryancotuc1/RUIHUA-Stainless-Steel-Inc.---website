@@ -26,15 +26,17 @@ Deno.serve(async (req) => {
         };
 
         const htmlBody = `
-<h2>New Quote Request — Rui Hua Stainless Steel Inc.</h2>
-<hr/>
-<p><strong>Name:</strong> ${data.name || 'N/A'}</p>
-<p><strong>Phone:</strong> ${data.phone || 'N/A'}</p>
-<p><strong>Email:</strong> ${data.email || 'N/A'}</p>
-<p><strong>Project Type:</strong> ${projectTypeMap[data.project_type] || data.project_type || 'N/A'}</p>
-<p><strong>Service:</strong> ${serviceMap[data.service] || data.service || 'N/A'}</p>
-<p><strong>Address:</strong> ${data.address || 'N/A'}</p>
-<p><strong>Project Details:</strong><br/>${data.description || 'None provided'}</p>
+<h2 style="color:#1a1a1a;">New Quote Request — Rui Hua Stainless Steel Inc.</h2>
+<hr style="border:1px solid #ddd;"/>
+<table style="font-family:monospace;font-size:14px;border-collapse:collapse;width:100%;">
+  <tr><td style="padding:8px 0;font-weight:bold;width:160px;">Name:</td><td>${data.name || 'N/A'}</td></tr>
+  <tr><td style="padding:8px 0;font-weight:bold;">Phone:</td><td>${data.phone || 'N/A'}</td></tr>
+  <tr><td style="padding:8px 0;font-weight:bold;">Email:</td><td>${data.email || 'N/A'}</td></tr>
+  <tr><td style="padding:8px 0;font-weight:bold;">Project Type:</td><td>${projectTypeMap[data.project_type] || data.project_type || 'N/A'}</td></tr>
+  <tr><td style="padding:8px 0;font-weight:bold;">Service:</td><td>${serviceMap[data.service] || data.service || 'N/A'}</td></tr>
+  <tr><td style="padding:8px 0;font-weight:bold;">Address:</td><td>${data.address || 'N/A'}</td></tr>
+  <tr><td style="padding:8px 0;font-weight:bold;vertical-align:top;">Project Details:</td><td>${data.description || 'None provided'}</td></tr>
+</table>
         `.trim();
 
         const resendApiKey = Deno.env.get("RESEND_API_KEY");
@@ -46,9 +48,9 @@ Deno.serve(async (req) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                from: "Rui Hua Stainless Steel Inc. <onboarding@resend.dev>",
+                from: "Rui Hua Stainless Steel Inc. <quotes@ruihuastainlesssteel.com>",
                 to: ["jzwu29@yahoo.com"],
-                subject: `New Quote Request from ${data.name || 'Unknown'}`,
+                subject: `New Quote Request - Rui Hua Stainless Steel`,
                 html: htmlBody
             })
         });
@@ -56,11 +58,13 @@ Deno.serve(async (req) => {
         const result = await response.json();
 
         if (!response.ok) {
-            return Response.json({ error: result }, { status: 500 });
+            console.error("Resend error:", JSON.stringify(result));
+            return Response.json({ error: result.message || 'Email delivery failed' }, { status: 500 });
         }
 
         return Response.json({ success: true });
     } catch (error) {
+        console.error("sendQuoteNotification error:", error.message);
         return Response.json({ error: error.message }, { status: 500 });
     }
 });
